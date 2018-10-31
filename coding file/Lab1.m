@@ -3,7 +3,7 @@ load('C:\Users\Gustav\Desktop\Plugg Leuven\Machine Learning\Lab1\Master-LR\Datas
 load('C:\Users\Gustav\Desktop\Plugg Leuven\Machine Learning\Lab1\Master-LR\Dataset\subject.mat')
 %The feature that is choosen
 nr1= 6;
-nr2 = 2;
+nr2 = 1;
 
 %randomizing
 ix = randperm(length(label));
@@ -20,7 +20,7 @@ label_val= label(round((length(label)*0.4))+1:round((length(label)*0.7)));
 label_test = label(round((length(label)*0.7))+1:length(label)); 
 
 % 1 vs all classification
-activity = label == nr1;
+activity = label == 6; %Sitting down
 activity = double(activity);
 plotlabel = label;
 
@@ -28,10 +28,10 @@ plotlabel = label;
 %gplotmatrix(features(:,nr1),features(:,nr2),activity);
 %Feature nr
 
-
 X_Norm = ones(length(label_tr),2);
 X_Norm(:,1) = feat_tr(:,nr1);
-X_Norm(:,2) = feat_tr(:,2);
+X_Norm(:,2) = feat_tr(:,nr2);
+[X_Norm, mu, sigma] = featureNormalize(X_Norm)
 X_Norm =featureNormalize(X_Norm); %Normalization of the two features
 
 % X and y-values for the training set
@@ -44,24 +44,45 @@ y_tr = activity(1:round((length(label)*0.4)),:);
 lambda = 0;
 [theta, cost, exit_flag] = training(X_tr, y_tr, lambda);
 
+%NYTT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+X_Norm_test = ones(length(label_test),2);
+X_Norm_test(:,1) = feat_test(:,nr1);
+X_Norm_test(:,2) = feat_test(:,nr2);
+
+% Map X_poly_test and normalize (using mu and sigma)
+X_poly_test = bsxfun(@minus, X_Norm_test, mu);
+X_poly_test = bsxfun(@rdivide, X_poly_test, sigma);
+X_poly_test = [ones(size(X_poly_test, 1), 1), X_poly_test];         % Add Ones
+
+X_Norm_val = ones(length(label_val),2);
+X_Norm_val(:,1) = feat_val(:,nr1);
+X_Norm_val(:,2) = feat_val(:,nr2);
+
+% Map X_poly_val and normalize (using mu and sigma)
+X_norm_val = bsxfun(@minus, X_Norm_val, mu);
+X_norm_val = bsxfun(@rdivide, X_norm_val, sigma);
+X_norm_val = [ones(size(X_norm_val, 1), 1), X_norm_val];           % Add Ones
+%NYTT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+%Detta blev överflödigt nu
 %X and y- values for the validation set
-X1_val = feat_val(:,nr1);
-X2_val = feat_val(:,nr2);
-X_val = ones(length(label_val),3);
-X_val(:,2) = X1_val;
-X_val(:,3) = X2_val;
-y_val = activity(round((length(label)*0.4))+1:round((length(label)*0.7)));
+% X1_val = feat_val(:,nr1);
+% X2_val = feat_val(:,nr2);
+% X_val = ones(length(label_val),3);
+% X_val(:,2) = X1_val;
+% X_val(:,3) = X2_val;
+ y_val = activity(round((length(label)*0.4))+1:round((length(label)*0.7)));
 
 %Training score
 initial_theta = zeros(size(X_tr, 2), 1); 
 score_before_tr = F1_score(X_tr,initial_theta,y_tr);
 score_after_tr = F1_score(X_tr,theta,y_tr);
 %Validation score
-score_before_val = F1_score(X_val,initial_theta,y_val);
-score_after_val = F1_score(X_val,theta,y_val);
+score_before_val = F1_score(X_norm_val,initial_theta,y_val);
+score_after_val = F1_score(X_norm_val,theta,y_val);
 
 %Plotting the decision-boundary
-plotDecisionBoundary(theta,X_tr,y_val)
+%plotDecisionBoundary(theta,X_tr,y_val)
 
 %2.3 
 %adding polonial features
@@ -83,7 +104,7 @@ for i=1:length(lambda_pol)
 [theta, cost, exit_flag] = training(X_tr, y_tr, lambda_pol(i)); 
 theta_vector(i,:) = theta;
 score_vector_tr(i) = F1_score(X_tr,theta,y_tr);
-score_vector_val(i) = F1_score(X_val,theta,y_val);
+score_vector_val(i) = F1_score(X_norm_val,theta,y_val);
 end
 
 %Plotting lambda and F1-score for training and validation
