@@ -4,9 +4,8 @@ load('C:\Users\Gustav\Desktop\Plugg Leuven\Machine Learning\Lab1\Master-LR\Datas
 %The feature that is choosen
 nr= 6;
 
-ix = randperm(length(label));
-
 %randomizing
+ix = randperm(length(label));
 features = features(ix,:);
 label = label(ix);
 
@@ -29,6 +28,7 @@ plotlabel = label;
 %Feature nr
 
 % X and y-values for the training set
+norm = featureNormalize(feat_tr);
 X1_tr = feat_tr(:,nr);
 X2_tr = feat_tr(:,2);
 X_tr = ones(length(label_tr),3);
@@ -44,7 +44,7 @@ X_val(:,3) = X2_val;
 y_val = activity(round((length(label)*0.4))+1:round((length(label)*0.7)));
 
 lambda = 0;
-%initial_theta = zeros(n + 1, 1);
+initial_theta = zeros(size(X_tr, 2), 1); 
 [theta, cost, exit_flag] = training(X_tr, y_tr, lambda);
 
 %När vi räknar ut F1 score ska vi räkna ut F1 score för både training set
