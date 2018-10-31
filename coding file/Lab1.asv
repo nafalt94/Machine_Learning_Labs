@@ -28,11 +28,11 @@ plotlabel = label;
 %gplotmatrix(features(:,nr1),features(:,nr2),activity);
 %Feature nr
 
-
+%Normalization of the two features
 X_Norm = ones(length(label_tr),2);
 X_Norm(:,1) = feat_tr(:,nr1);
 X_Norm(:,2) = feat_tr(:,2);
-X_Norm =featureNormalize(X_Norm); %Normalization of the two features
+%X_Norm =featureNormalize(X_Norm);
 
 % X and y-values for the training set
 X_tr = ones(length(label_tr),3);
@@ -61,7 +61,7 @@ score_before_val = F1_score(X_val,initial_theta,y_val);
 score_after_val = F1_score(X_val,theta,y_val);
 
 %Plotting the decision-boundary
-plotDecisionBoundary(theta,X_tr,y_val)
+%plotDecisionBoundary(theta,X_val,y_val)
 
 %2.3 
 %adding polonial features
