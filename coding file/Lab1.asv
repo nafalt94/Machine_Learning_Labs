@@ -1,6 +1,14 @@
 load('C:\Users\Gustav\Desktop\Plugg Leuven\Machine Learning\Lab1\Master-LR\Dataset\Features.mat')
 load('C:\Users\Gustav\Desktop\Plugg Leuven\Machine Learning\Lab1\Master-LR\Dataset\Label.mat')
 load('C:\Users\Gustav\Desktop\Plugg Leuven\Machine Learning\Lab1\Master-LR\Dataset\subject.mat')
+%The feature that is choosen
+nr= 6;
+
+ix = randperm(length(label));
+
+%randomizing
+features = features(ix,:);
+label = label(ix);
 
 %Excercise 1
 feat_tr = features(1:round((length(label)*0.4)),:); 
@@ -12,50 +20,84 @@ label_val= label(round((length(label)*0.4))+1:round((length(label)*0.7)));
 label_test = label(round((length(label)*0.7))+1:length(label)); 
 
 % 1 vs all classification
-activity = label == 6;
+activity = label == nr;
 activity = double(activity);
 plotlabel = label;
 
-
 %figure;
-%gplotmatrix(features(:,6),features(:,2),activity);
-%Feature nr5
-X1 = feat_tr(:,6);
-X2=feat_tr(:,2);
-X = ones(length(label_tr),3);
-X(:,2) = X1;
-X(:,3) = X2;
+%gplotmatrix(features(:,5),features(:,2),activity);
+%Feature nr
 
-[m, n] = size(X);
-
-y = activity(1:round((length(label)*0.4)),:); 
+% X and y-values for the training set
+X1_tr = feat_tr(:,nr);
+X2_tr = feat_tr(:,2);
+X_tr = ones(length(label_tr),3);
+X_tr(:,2) = X1_tr;
+X_tr(:,3) = X2_tr;
+y_tr = activity(1:round((length(label)*0.4)),:); 
+%X and y- values for the validation set
+X1_val = feat_val(:,nr);
+X2_val = feat_val(:,2);
+X_val = ones(length(label_val),3);
+X_val(:,2) = X1_val;
+X_val(:,3) = X2_val;
+y_val = activity(round((length(label)*0.4))+1:round((length(label)*0.7)));
 
 lambda = 0;
 %initial_theta = zeros(n + 1, 1);
-initial_theta = zeros(size(X, 2), 1);
+initial_theta = zeros(size(X_tr, 2), 1);
+[theta, cost, exit_flag] = training(X_tr, y_tr, lambda,initial_theta);
 
-%[cost, grad] = costFunctionReg(initial_theta, X, y, lambda);
-options = optimset('GradObj','on','MaxIter',400);
-[theta, cost, exit_flag] = fminunc(@(t)(costFunctionReg(t, X, y, lambda)),initial_theta,options);
+%När vi räknar ut F1 score ska vi räkna ut F1 score för både training set
+%och validation för detta theta. När vi i senare del tunar lambda så ska vi
+%använda en hypotesen för att testa på test-setet.
 
-%theta = fminunc(costFunctionReg(initial_theta, X, y, lambda),X0);    
+%Training score
+score_before_tr = F1_score(X_tr,initial_theta,y_tr);
+score_after_tr = F1_score(X_tr,theta,y_tr);
+%Validation score
+score_before_val = F1_score(X_val,initial_theta,y_val);
+score_after_val = F1_score(X_val,theta,y_val);
 
-
-z1 = X*(initial_theta);
-score_before = F1_score(z1,y);
-
-z2 = X*(theta);
-score_after = F1_score(z2,y);
-
-%plotDecisionBoundary(theta,X,y)
+%Plotting the decision-boundary
+%plotDecisionBoundary(theta,X_val,y_val)
 %gplotmatrix(features(:,5),features(:,1),activity);
 
 %2.3 
 %adding polonial features
-X_pol = mapFeature(X1,X2,6);
-lambda_pol = (3^(:1:(3^(10));
+X_pol = mapFeature(X1_tr,X2_tr,6);
+%lambda_pol = (3^(-10)):.2:(3^(10));
 
-x = 10:1:20
+lambda_pol(1) = 3^(-10);
+i = 1;
+while(lambda_pol(i)<(3^(10)))
+   i=i+1;
+    lambda_pol(i) = lambda_pol(i-1)*2; 
+end
+
+theta_vector = zeros(length(lambda_pol),3);
+score_vector_tr = zeros(length(lambda_pol),1);
+score_vector_val = zeros(length(lambda_pol),1);
+
+for i=1:length(lambda_pol)
+[theta, cost, exit_flag] = training(X_tr, y_tr, lambda_pol(i),initial_theta); 
+theta_vector(i,:) = theta;
+score_vector_tr(i) = F1_score(X_tr,theta,y_tr);
+score_vector_val(i) = F1_score(X_val,theta,y_val);
+end
+%Plotting lambda and F1-score for training and validation
+figure
+hold on
+plot(lambda_pol,score_vector_val)
+plot(lambda_pol,score_vector_tr)
+axis([0 700 0 1])
+legend('Validation','Training')
+%When lambda increases --> High bias
+
+[val, idx] = max(score_vector_val);
+
+% going from 8 features to quad ratic representation
+% använd x2fx
 
 
 

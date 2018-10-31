@@ -1,5 +1,5 @@
-function [score] = F1_score(z,y)
-
+function [score] = F1_score(X,theta,y)
+z = X*(theta);
 h = sigmoid(z);
 h = round(h);
 true_pos =0;
