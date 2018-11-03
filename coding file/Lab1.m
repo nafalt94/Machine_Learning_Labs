@@ -3,7 +3,7 @@ load('C:\Users\Gustav\Desktop\Plugg Leuven\Machine Learning\Lab1\Master-LR\Datas
 load('C:\Users\Gustav\Desktop\Plugg Leuven\Machine Learning\Lab1\Master-LR\Dataset\subject.mat')
 %The feature that is choosen
 nr1= 6;
-nr2 = 1;
+nr2 = 2;
 
 %randomizing
 ix = randperm(length(label));
@@ -20,7 +20,7 @@ label_val= label(round((length(label)*0.4))+1:round((length(label)*0.7)));
 label_test = label(round((length(label)*0.7))+1:length(label)); 
 
 % 1 vs all classification
-activity = label == 6; %Sitting down
+activity = label == 6; %Sitting down (label = 6)
 activity = double(activity);
 plotlabel = label;
 
@@ -84,44 +84,60 @@ score_after_val = F1_score(X_norm_val,theta,y_val);
 %Plotting the decision-boundary
 %plotDecisionBoundary(theta,X_tr,y_val)
 
+%fprintf('Program paused. Press enter to continue.\n');
+%pause;
+
+
 %2.3 
 %adding polonial features
 X_pol = mapFeature(feat_tr(:,nr1),feat_tr(:,nr2),6);
 %lambda_pol = (3^(-10)):.2:(3^(10));
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!NEDAN ÄR NYTT!!!!!
 
-lambda_pol(1) = 3^(-10);
-i = 1;
-while(lambda_pol(i)<(3^(10)))
-   i=i+1;
-    lambda_pol(i) = lambda_pol(i-1)*2; 
+p = 6;
+X_poly = mapFeature(feat_tr(:,nr1),feat_tr(:,nr2),p);
+X_poly(:,1) = [];
+[X_poly, mu, sigma] = featureNormalize(X_poly) ; % Normalize
+X_poly = [ones(length(label_tr), 1), X_poly]; % Add Ones
+
+% Map X_poly_test and normalize (using mu and sigma)
+
+X_poly_test = mapFeature(feat_test(:,nr1),feat_test(:,nr2),p);
+X_poly_test(:,1) = [];
+X_poly_test = bsxfun(@minus, X_poly_test, mu);
+X_poly_test = bsxfun(@rdivide, X_poly_test, sigma);
+X_poly_test = [ones(size(X_poly_test, 1), 1), X_poly_test];         % Add Ones
+
+% Map X_poly_val and normalize (using mu and sigma)
+X_poly_val = mapFeature(feat_val(:,nr1),feat_val(:,nr2),p);
+X_poly_val(:,1) = [];
+X_poly_val = bsxfun(@minus, X_poly_val, mu);
+X_poly_val = bsxfun(@rdivide, X_poly_val, sigma); 
+X_poly_val = [ones(size(X_poly_val, 1), 1), X_poly_val];    %Add ones 
+
+[lambda_vec, error_train, error_val] = ...
+    validationCurve(X_poly, y_tr, X_poly_val, y_val);
+
+close all;
+semilogx(lambda_vec, error_train, lambda_vec, error_val);
+legend('Train', 'Cross Validation');
+xlabel('lambda');
+ylabel('Error');
+
+fprintf('lambda\t\tTrain Error\tValidation Error\n');
+for i = 1:length(lambda_vec)
+	fprintf(' %f\t%f\t%f\n', ...
+            lambda_vec(i), error_train(i), error_val(i));
 end
+lambda=lambda_vec(length(lambda_vec));
+initial_theta = zeros(28,1);
+options = optimset('GradObj', 'on', 'MaxIter', 400);
+[theta, J, exit_flag] = ...
+	fminunc(@(t)(costFunctionReg(t, X_poly, y_tr, lambda)), initial_theta, options);
 
-theta_vector = zeros(length(lambda_pol),3);
-score_vector_tr = zeros(length(lambda_pol),1);
-score_vector_val = zeros(length(lambda_pol),1);
-
-for i=1:length(lambda_pol)
-[theta, cost, exit_flag] = training(X_tr, y_tr, lambda_pol(i)); 
-theta_vector(i,:) = theta;
-score_vector_tr(i) = F1_score(X_tr,theta,y_tr);
-score_vector_val(i) = F1_score(X_norm_val,theta,y_val);
-end
-
-%Plotting lambda and F1-score for training and validation
-%figure
-%hold on
-%plot(lambda_pol,score_vector_val)
-%plot(lambda_pol,score_vector_tr)
-%axis([0 700 0 1])
-%legend('Cross validation','Training')
-%When lambda increases --> High bias
-
-%Hittar vilken lambda som är bäst
-[val, idx] = max(score_vector_val);
-%plotDecisionBoundary(theta_vector(idx,:),X_val,y_val)
-
-% going from 8 features to quad ratic representation
-% använd x2fx
-
-
+%fprintf('Program paused. Press enter to continue.\n');
+%pause;
+plotDecisionBoundary(theta, X_poly, y_tr);
+hold on;
+title(sprintf('lambda = %g', lambda))
 
