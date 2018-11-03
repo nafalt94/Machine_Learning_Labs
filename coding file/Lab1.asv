@@ -198,6 +198,7 @@ for i=1:l:t
  feat_tr_2 = [feat_tr ; feat_test(1:(i),:)];
  y_tr_2 = [y_tr ; y_test(1:(i),:)];
   
+ 
 theta = trainLinearReg(feat_tr_2, y_tr_2, lambda);
 f1_score_tr(count) = F1_score(feat_tr_2,theta,y_tr_2);
 f1_score_val(count) = F1_score(feat_val,theta,y_val);
@@ -207,11 +208,16 @@ toc
 
 %%
 
-plot(training,f1_score_tr)
+plot(x1,y1) 
+hold on 
+plot(x2,y2)
+hold off
+
+plot(training,f1_score)
 hold on
-plot(training, f1_score_val)
+plot(tr
 axis([0 3000 0 1])
-legend('Training','CV')
+
 
 
 
