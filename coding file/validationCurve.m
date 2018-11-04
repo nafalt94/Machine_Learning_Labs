@@ -42,10 +42,11 @@ options = optimset('GradObj', 'on', 'MaxIter', 400);
           % You should store the result in error_train(i)
           % and error_val(i)
           
-          theta = trainLinearReg(X, y, lambda);
+          %NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
+         % theta = trainLinearReg(X, y, lambda);
           [theta, J, exit_flag] = ...
 	fminunc(@(t)(costFunctionReg(t, X, y, lambda)), initial_theta, options);
-
+%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
     error_train(i) = F1_score(X,theta,y);
     error_val(i) = F1_score(Xval,theta,yval);
           

@@ -20,9 +20,9 @@ label_val= label(round((length(label)*0.4))+1:round((length(label)*0.7)));
 label_test = label(round((length(label)*0.7))+1:length(label)); 
 
 % 1 vs all classification
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 activity = label == 2; %Sitting down (label = 6)
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 activity = double(activity);
 plotlabel = label;
 
@@ -132,7 +132,7 @@ for i = 1:length(lambda_vec)
 	fprintf(' %f\t%f\t%f\n', ...
             lambda_vec(i), error_train(i), error_val(i));
 end
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [val, idx] = max(error_train);
 lambda=lambda_vec(idx);
 initial_theta = zeros(28,1);
@@ -143,7 +143,7 @@ options = optimset('GradObj', 'on', 'MaxIter', 400);
 plotDecisionBoundary(theta, X_poly_val, y_val);
 hold on;
 title(sprintf('CV: lambda = %g and F1 score = %d', lambda, F1_score(X_poly_val,theta,y_val)))
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
+%NEWNEW
 %% 2.4
 % a) - Linear
 X8_norm =featureNormalize(feat_tr);
@@ -159,12 +159,10 @@ lambda = 0;
 
 close all;
 semilogx(lambda_vec, error_train, lambda_vec, error_val);
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
 title(['Eight feat linear traininga CV'])
 legend('Train', 'Cross Validation');
 xlabel('lambda');
 ylabel('F1 Score');
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
 
 %%
 
@@ -178,15 +176,12 @@ X8_poly_val = x2fx(feat_val,'quadratic');
 close all;
 semilogx(lambda_vec, error_train, lambda_vec, error_val);
 %title(strcat('Eight poly CV: Lambda=', num2str(lambda)))
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
 title(['Eight poly training and CV'])
 legend('Train', 'Cross Validation');
 xlabel('lambda');
 ylabel('F1');
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
 
 %%
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
 tic
 X8_poly = x2fx(feat_tr,'quadratic');
 X8_poly_val = x2fx(feat_val,'quadratic');
@@ -220,7 +215,6 @@ f1_score_val(count) = max(error_val);
 
 % f1_score_tr(count) = F1_score(feat_tr_2,theta,y_tr_2);
 % f1_score_val(count) = F1_score(feat_val,theta,y_val);
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
 count = count +1;
 end
 toc
@@ -231,12 +225,10 @@ plot(training,f1_score_tr)
 hold on
 plot(training, f1_score_val)
 axis([0 3000 0 1])
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
 legend('Training','CV')
 title('Adding more training examples')
 xlabel('Number of extra training examples');
 ylabel('F1');
-%NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
 
 
 
