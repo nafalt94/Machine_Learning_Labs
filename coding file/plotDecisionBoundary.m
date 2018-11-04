@@ -47,7 +47,7 @@ end
 % Put some labels 
 hold on;
 % Labels and Legend
-xlabel('Feature1')
+xlabel('Feature6')
 ylabel('Feature2')
 
 % Specified in plot order

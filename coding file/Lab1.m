@@ -122,26 +122,24 @@ close all;
 semilogx(lambda_vec, error_train, lambda_vec, error_val);
 legend('Train', 'Cross Validation');
 xlabel('lambda');
-ylabel('Error');
+ylabel('F1 score');
+title('Two feat CV poly of 6th power');
 
 fprintf('lambda\t\tTrain Error\tValidation Error\n');
 for i = 1:length(lambda_vec)
 	fprintf(' %f\t%f\t%f\n', ...
             lambda_vec(i), error_train(i), error_val(i));
 end
-lambda=lambda_vec(1);
+[val, idx] = max(error_train);
+lambda=lambda_vec(idx);
 initial_theta = zeros(28,1);
-X_poly = mapFeature(feat_tr(:,nr1),feat_tr(:,nr2),p);
-X_poly_test = mapFeature(feat_test(:,nr1),feat_test(:,nr2),p);
 options = optimset('GradObj', 'on', 'MaxIter', 400);
 [theta, J, exit_flag] = ...
-	fminunc(@(t)(costFunctionReg(t, X_poly_test, y_test, lambda)), initial_theta, options);
+	fminunc(@(t)(costFunctionReg(t, X_poly, y_tr, lambda)), initial_theta, options);
 
-%fprintf('Program paused. Press enter to continue.\n');
-%pause;
-plotDecisionBoundary(theta, X_poly_test, y_val);
+plotDecisionBoundary(theta, X_poly_val, y_val);
 hold on;
-title(sprintf('lambda = %g', lambda))
+title(sprintf('CV: lambda = %g and F1 score = %d', lambda, F1_score(X_poly_val,theta,y_val)))
 %% 2.4
 % a) - Linear
 X8_norm =featureNormalize(feat_tr);
@@ -157,6 +155,7 @@ lambda = 0;
 
 close all;
 semilogx(lambda_vec, error_train, lambda_vec, error_val);
+title(['Eight feat linear traininga CV'])
 legend('Train', 'Cross Validation');
 xlabel('lambda');
 ylabel('F1 Score');
@@ -172,9 +171,11 @@ X8_poly_val = x2fx(feat_val,'quadratic');
 
 close all;
 semilogx(lambda_vec, error_train, lambda_vec, error_val);
+%title(strcat('Eight poly CV: Lambda=', num2str(lambda)))
+title(['Eight poly training and CV'])
 legend('Train', 'Cross Validation');
 xlabel('lambda');
-ylabel('Error');
+ylabel('F1');
 
 %%
 tic
@@ -193,7 +194,6 @@ f1_score_tr= zeros(t/l,1);
 f1_score_val =  zeros(t/l,1);
 count  = 1;
 for i=1:l:t
- 
  out = ones(size(feat_tr(:,1)));
  feat_tr_2 = [feat_tr ; feat_test(1:(i),:)];
  y_tr_2 = [y_tr ; y_test(1:(i),:)];
@@ -212,6 +212,9 @@ hold on
 plot(training, f1_score_val)
 axis([0 3000 0 1])
 legend('Training','CV')
+title('Adding more training examples')
+xlabel('Number of extra training examples');
+ylabel('F1');
 
 
 
