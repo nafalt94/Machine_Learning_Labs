@@ -31,6 +31,8 @@ error_val = zeros(length(lambda_vec), 1);
 %               lambda = lambda_vec(i)
 %
 % Note: You can loop over lambda_vec with the following:
+initial_theta = zeros(28,1);
+options = optimset('GradObj', 'on', 'MaxIter', 400);
 
       for i = 1:length(lambda_vec)
           lambda = lambda_vec(i);
@@ -40,9 +42,9 @@ error_val = zeros(length(lambda_vec), 1);
           % and error_val(i)
           
           theta = trainLinearReg(X, y, lambda);
+          [theta, J, exit_flag] = ...
+	fminunc(@(t)(costFunctionReg(t, X, y, lambda)), initial_theta, options);
 
-    %error_train(i) = linearRegCostFunction(X, y, theta, 0);
-    %error_val(i) = linearRegCostFunction(Xval, yval, theta, 0);
     error_train(i) = F1_score(X,theta,y);
     error_val(i) = F1_score(Xval,theta,yval);
           
