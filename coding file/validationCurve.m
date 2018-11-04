@@ -31,7 +31,8 @@ error_val = zeros(length(lambda_vec), 1);
 %               lambda = lambda_vec(i)
 %
 % Note: You can loop over lambda_vec with the following:
-initial_theta = zeros(28,1);
+
+initial_theta = zeros(size(X,2),1);
 options = optimset('GradObj', 'on', 'MaxIter', 400);
 
       for i = 1:length(lambda_vec)
