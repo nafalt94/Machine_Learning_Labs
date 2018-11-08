@@ -5,8 +5,8 @@ load('Label.mat')
 load('subject.mat')
 %The features and activity that are choosen
 nr1= 6;
-nr2 = 4;
-labelnr = 6;
+nr2 = 2;
+labelnr = 4;
 
 %randomizing
 ix = randperm(length(label));
