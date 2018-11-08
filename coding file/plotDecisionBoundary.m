@@ -49,6 +49,7 @@ hold on;
 % Labels and Legend
 xlabel('Feature6')
 ylabel('Feature2')
+title('CV: Lambda = 0')
 
 % Specified in plot order
 %legend('Positive-train', 'Negative-train','Decision boundary');

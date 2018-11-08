@@ -1,4 +1,4 @@
-function [lambda_vec, error_train, error_val] = ...
+function [lambda_vec, f1_train, f1_val] = ...
     validationCurve(X, y, Xval, yval)
 %VALIDATIONCURVE Generate the train and validation errors needed to
 %plot a validation curve that we can use to select lambda
@@ -47,8 +47,8 @@ options = optimset('GradObj', 'on', 'MaxIter', 400);
           [theta, J, exit_flag] = ...
 	fminunc(@(t)(costFunctionReg(t, X, y, lambda)), initial_theta, options);
 %NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEWWWWWWWWW
-    error_train(i) = F1_score(X,theta,y);
-    error_val(i) = F1_score(Xval,theta,yval);
+    f1_train(i) = F1_score(X,theta,y);
+    f1_val(i) = F1_score(Xval,theta,yval);
           
       end
 

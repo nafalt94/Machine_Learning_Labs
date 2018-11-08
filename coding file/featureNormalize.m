@@ -5,11 +5,25 @@ function [X_norm, mu, sigma] = featureNormalize(X)
 %   is 1. This is often a good preprocessing step to do when
 %   working with learning algorithms.
 
-mu = mean(X);
-X_norm = bsxfun(@minus, X, mu);
+[rows, columns] = size(X);
+mu=zeros(columns,1);
+sigma=zeros(columns,1);
+X_norm=X;
 
-sigma = std(X_norm);
-X_norm = bsxfun(@rdivide, X_norm, sigma);
+for i =1:columns
+   mu(i) = mean(X(:,i));
+    X_norm(:,i) = X_norm(:,i) - mu(i); %bsxfun(@minus, X(:,i), mu(i));
+    
+     sigma(i) = std(X_norm(:,i));
+ X_norm(:,i) = X_norm(:,i)/sigma(i); %bsxfun(@rdivide, X_norm(i,:), sigma(i));
+ 
+end
+
+ mu = mean(X);
+% X_norm = bsxfun(@minus, X, mu);
+% 
+ sigma = std(X_norm);
+% X_norm = bsxfun(@rdivide, X_norm, sigma);
 
 
 % ============================================================
