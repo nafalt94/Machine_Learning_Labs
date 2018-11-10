@@ -6,17 +6,19 @@ load('subject.mat')
 %The features and activity that are choosen
 nr1= 6;
 nr2 = 2;
-labelnr = 4;
+labelnr = 2;
 
 %randomizing
 ix = randperm(length(label));
 features = features(ix,:);
 label = label(ix);
 
+featuresLin=featureNormalize(features);
+
 %% Excercise 1
-feat_tr = features(1:round((length(label)*0.4)),:); 
-feat_val = features(round((length(label)*0.4))+1:round((length(label)*0.7)),:); 
-feat_test = features(round((length(label)*0.7))+1:length(label),:); 
+feat_tr = featuresLin(1:round((length(label)*0.4)),:); 
+feat_val = featuresLin(round((length(label)*0.4))+1:round((length(label)*0.7)),:); 
+feat_test = featuresLin(round((length(label)*0.7))+1:length(label),:); 
 
 label_tr = label(1:round((length(label)*0.4)));
 label_val= label(round((length(label)*0.4))+1:round((length(label)*0.7))); 
@@ -41,8 +43,8 @@ gplotmatrix(features(:,nr1),features(:,nr2),activity);
 X_Norm = ones(length(label_tr),2);
 X_Norm(:,1) = feat_tr(:,nr1);
 X_Norm(:,2) = feat_tr(:,nr2);
-[X_Norm, mu, sigma] = featureNormalize(X_Norm);
-X_Norm =featureNormalize(X_Norm); %Normalization of the two features
+%[X_Norm, mu, sigma] = featureNormalize(X_Norm);
+%X_Norm =featureNormalize(X_Norm); %Normalization of the two features
 
 % create X and y-values for the training set (normalized)
 X_tr = ones(length(label_tr),3);
@@ -55,20 +57,20 @@ lambda = 0;
 [theta, cost, exit_flag] = training(X_tr, y_tr, lambda);
 
 % Normalize the test data:
-X_Norm_test = ones(length(label_test),2);
-X_Norm_test(:,1) = feat_test(:,nr1);
-X_Norm_test(:,2) = feat_test(:,nr2);
-X_norm_test = bsxfun(@minus, X_Norm_test, mu);
-X_norm_test = bsxfun(@rdivide, X_norm_test, sigma);
-X_norm_test = [ones(size(X_norm_test, 1), 1), X_norm_test];         % Add Ones
+% X_Norm_test = ones(length(label_test),2);
+% X_Norm_test(:,1) = feat_test(:,nr1);
+% X_Norm_test(:,2) = feat_test(:,nr2);
+% X_norm_test = bsxfun(@minus, X_Norm_test, mu);
+% X_norm_test = bsxfun(@rdivide, X_norm_test, sigma);
+% X_norm_test = [ones(size(X_norm_test, 1), 1), X_norm_test];         % Add Ones
 
 % Normalize the validation data:
 X_Norm_val = ones(length(label_val),2);
 X_Norm_val(:,1) = feat_val(:,nr1);
 X_Norm_val(:,2) = feat_val(:,nr2);
-X_norm_val = bsxfun(@minus, X_Norm_val, mu);
-X_norm_val = bsxfun(@rdivide, X_norm_val, sigma);
-X_norm_val = [ones(size(X_norm_val, 1), 1), X_norm_val];           % Add Ones
+% X_norm_val = bsxfun(@minus, X_Norm_val, mu);
+% X_norm_val = bsxfun(@rdivide, X_norm_val, sigma);
+X_norm_val = [ones(size(X_Norm_val, 1), 1), X_Norm_val];           % Add Ones
 
 % y values for training and validation:
 y_val = activity(round((length(label)*0.4))+1:round((length(label)*0.7)));
@@ -85,10 +87,14 @@ score_after_val = F1_score(X_norm_val,theta,y_val);
 
 %Plotting the linear decision-boundary
 plotDecisionBoundary(theta,X_norm_val,y_val)
+%plotDecisionBoundary(theta,X_tr,y_tr)
 
 %% 
 
 %2.3 
+feat_tr = features(1:round((length(label)*0.4)),:); 
+feat_val = features(round((length(label)*0.4))+1:round((length(label)*0.7)),:); 
+feat_test = features(round((length(label)*0.7))+1:length(label),:); 
 
 % Adding polonial features with degree p
 p = 6;
