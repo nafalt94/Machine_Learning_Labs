@@ -254,7 +254,7 @@ semilogx(lambda, acctr,'-+', lambda, accval, '-o');
 title(['Hidden layer: 256 Number of iterations: 400'])
 legend('Train', 'Cross Validation');
 xlabel('lambda');
-ylabel('Accurancy (%)');
+ylabel('Accurancy');
 axis([0 lambda(7) 0 1])
  
 
