@@ -69,10 +69,15 @@ nn_params = [Theta1(:) ; Theta2(:)];
 
 %% Training the ANN model
 % Weight regularization parameter (we set this to 0 here).
+y_label = zeros(num_labels, length(Xtr_reshape)); 
+for i=1:length(Xtr_reshape)
+  y_label(YTrain(i),i)=1;
+end
+
 lambda = 0;
 
 J = nnCostFunction(nn_params, input_layer_size, hidden_layer_size, ...
-                   num_labels, Xtr_reshape, YTrain, lambda);
+                   num_labels, Xtr_reshape, YTrain, lambda,y_label);
                
          
 %  Once your cost function implementation is correct, you should now
@@ -85,7 +90,7 @@ fprintf('\nChecking Cost Function (w/ Regularization) ... \n')
 lambda = 1;
 
 J = nnCostFunction(nn_params, input_layer_size, hidden_layer_size, ...
-                   num_labels, Xtr_reshape, YTrain, lambda);
+                   num_labels, Xtr_reshape, YTrain, lambda,y_label);
                
 fprintf(['Cost: %f '...
          '\n\n'], J);
@@ -151,7 +156,7 @@ checkNNGradients(lambda);
 
 % Also output the costFunction debugging values
 debug_J  = nnCostFunction(nn_params, input_layer_size, ...
-                          hidden_layer_size, num_labels, X, y, lambda);
+                          hidden_layer_size, num_labels, X, y, lambda,y_label);
 
 fprintf(['\n\nCost at (fixed) debugging parameters (w/ lambda = %f): %f ' ...
          '\n(for lambda = 3, this value should be about 0.576051)\n\n'], lambda, debug_J);
@@ -164,7 +169,7 @@ pause;
 
 fprintf('\nTraining Neural Network... \n')
 
-options = optimset('MaxIter', 2);
+options = optimset('MaxIter', 400);
 %  You should also try different values of lambda
 lambda = [0.0001 0.001 0.01 0.1 1 10 100];
 %Jvec = zeros(7,1);
@@ -178,12 +183,12 @@ parfor (i = 1:7,M)
 costFunction = @(p) nnCostFunction(p, ...
                                    input_layer_size, ...
                                    hidden_layer_size, ...
-                                   num_labels, Xtr_reshape, YTrain, lambda(i));
+                                   num_labels, Xtr_reshape, YTrain, lambda(i),y_label);
 
 % Now, costFunction is a function that takes in only one argument (the
 % neural network parameters)
 [nn_params, cost] = fmincg(costFunction, initial_nn_params, options);
-cost
+
 Jvec(i) = min(cost);
 % Obtain Theta1 and Theta2 back from nn_params
 Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
@@ -191,17 +196,15 @@ Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
 
 Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
                  num_labels, (hidden_layer_size + 1));
-Theta2
 theta1vec(i,:,:) = Theta1;
 theta2vec(i,:,:) = Theta2;
+
         
 end
 toc
 
 %% ================= Part 10: Implement Predict =================
 predvec=[];
-
-
 
 for i = 1:size(Jvec)
     dummy1 = reshape(theta1vec(i,:,:),256,3921);
@@ -213,15 +216,46 @@ end
 %pred = predict(theta1vec(1,:,:), theta2vec(1,:,:), Xval_reshape);
 valAcc= [];
 trAcc=[];
-for i = 1:size(Jvec)
-%fprintf('\nTraining Set Accuracy: %f\n', mean(double(predvec(i) == YValidation)) * 100);
-valAcc(i) =  mean(double(predvec(i) == YValidation)) * 100; 
-trAcc(i) = mean(double(predvec_tr(i) == YTrain)) * 100;
-end
-plot(lambda,valAcc)
      
 %% Plotting training and validation accuracy for diferent lambda
+%testing
+rightsval=zeros(7,1);
+wrongsval=zeros(7,1);
+rightstr=zeros(7,1);
+wrongstr=zeros(7,1);
+accval=zeros(7,1);
+acctr=zeros(7,1);
 
+for j =1:size(Jvec)
+for i = 1:size(YValidation)
+    if(predvec(j,i) == YValidation(i))
+       rightsval(j) = rightsval(j) +1; 
+    else
+        wrongsval(j) = wrongsval(j)+1;
+    end
+end
+
+for k = 1:size(YTrain)
+    if(predvec_tr(j,k) == YTrain(k))
+       rightstr(j) = rightstr(j) +1; 
+    else
+        wrongstr(j) = wrongstr(j)+1;
+    end
+end
+
+accval(j) = rightsval(j)/(rightsval(j)+wrongsval(j));
+acctr(j) = rightstr(j)/(rightstr(j)+wrongstr(j));
+
+end
+
+%plot(lambda,valAcc)
+figure;
+semilogx(lambda, acctr,'-+', lambda, accval, '-o');
+title(['Hidden layer: 256 Number of iterations: 400'])
+legend('Train', 'Cross Validation');
+xlabel('lambda');
+ylabel('Accurancy (%)');
+axis([0 lambda(7) 0 1])
  
 
 %% Try the trained model in real-life
